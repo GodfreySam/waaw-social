@@ -3,6 +3,8 @@ const { model, Schema } = mongoose;
 
 let userSchema = new Schema(
 	{
+		firstname: String,
+		lastname: String,
 		username: String,
 		email: String,
 		password: String,
@@ -10,7 +12,7 @@ let userSchema = new Schema(
 		avatar: String,
 		avatarSmall: String,
 		secretToken: String,
-		confirmed: {
+		verified: {
 			type: Boolean,
 			default: false,
 		},

@@ -5,8 +5,13 @@ const welcomeEmail = async (req, username, email, secretToken) => {
       welcome to WAAWChat, ${username}, we're excited to have you join us.
       <br/>
       <br/>
-      You can copy and paste the following code <strong>${secretToken}</strong> in the confirmation page or
-       click on the link below to activate your account.
+      You can copy and paste the following code  in the confirmation page 
+      <br/>
+      <br/>
+      <strong>${secretToken}</strong>
+      <br/>
+      <br/>
+      or click on the link below to activate your account.
        <br/>
        <br/>
        Confirmation Link: http://${req.headers.host}/user/confirm-account/${secretToken}

@@ -1,39 +1,58 @@
 const { User } = require("../../models/User.model");
 const bcryptjs = require("bcryptjs");
 const { compare } = bcryptjs;
-const jwt = require('jsonwebtoken');
-
+const jwt = require("jsonwebtoken");
 
 const loginUser = async (req, res, next) => {
-   try {
-      let { userInput, password } = req.body;
-      if (!userInput || !password) return res.status(400).json({ msg: 'All fields are required' });
+	try {
+		let { userInput, password } = req.body;
 
-      let findUser = await User.findOne({
-         $or: [{ username: userInput }, { email: userInput }],
-      });
+		if (!userInput || !password)
+			return res
+				.status(400)
+				.json({ success: false, msg: "All fields are required" });
 
-      if (!findUser) return res.status(404).json({ msg: 'Invalid login credentials' });
+		let findUser = await User.findOne({
+			$or: [{ username: userInput }, { email: userInput }],
+		});
 
-      if (!findUser.confirmed) return res.status(401).json({ msg: 'Please check your email to confirm your identify' });
-      
-      let passwordMatch = await compare(password, findUser.password);
+		if (!findUser)
+			return res
+				.status(400)
+				.json({ success: false, msg: "Username does not exist" });
 
-      if (!passwordMatch) return res.status(403).json({ msg: 'Password do not match' });
+		if (!findUser.verified)
+			return res
+				.status(401)
+				.json({
+					success: false,
+					msg: "Please check your email to confirm your identity",
+				});
 
-      let token = jwt.sign({findUser}, process.env.JWT_SECRET, { expiresIn: '365d' });
-      res.status(200).json({
-         msg: 'Login successful',
-         token,
-         user: {
-            ...findUser._doc,
-            password: ''
-         }
-      });
-      
-      
+		let passwordMatch = await compare(password, findUser.password);
+
+		if (!passwordMatch)
+			return res
+				.status(403)
+				.json({ success: false, msg: "Invalid login credential" });
+
+		let token = jwt.sign({ findUser }, process.env.JWT_SECRET, {
+			expiresIn: "365d",
+		});
+
+		res.status(200).json({
+			success: true,
+			msg: "Login successful",
+			data: {
+				token,
+				user: {
+					...findUser._doc,
+					password: "",
+				},
+			},
+		});
 	} catch (err) {
-		res.status(500).json({ msg: err.message });
+		return res.status(500).json({ msg: err.message });
 	}
 };
 
